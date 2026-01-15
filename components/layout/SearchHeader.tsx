@@ -1,0 +1,54 @@
+"use client"
+
+import Link from "next/link";
+import { Plane, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useSearchParams } from "next/navigation";
+import { format } from "date-fns";
+
+export function SearchHeader() {
+    const searchParams = useSearchParams();
+    const origin = searchParams.get("origin") || "Anywhere";
+    const destination = searchParams.get("destination") || "Anywhere";
+    const dateStr = searchParams.get("date");
+
+    let formattedDate = "";
+    if (dateStr) {
+        try {
+            formattedDate = format(new Date(dateStr), "MMM d");
+        } catch (e) {
+            formattedDate = dateStr;
+        }
+    }
+
+    return (
+        <header className="bg-white dark:bg-slate-800 border-b sticky top-0 z-30">
+            <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                <Link href="/" className="flex items-center gap-2">
+                    <Plane className="w-6 h-6 text-indigo-600 fill-indigo-600" />
+                    <span className="font-bold text-xl text-indigo-900 dark:text-white">SkyScout</span>
+                </Link>
+
+                {/* Dynamic Compact Search Bar */}
+                <div className="hidden md:flex border rounded-full px-4 py-1.5 items-center gap-3 bg-slate-50 dark:bg-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors cursor-pointer border-slate-200">
+                    <span className="text-slate-900 dark:text-slate-200">{origin}</span>
+                    <span className="text-slate-400">→</span>
+                    <span className="text-slate-900 dark:text-slate-200">{destination}</span>
+                    {formattedDate && (
+                        <>
+                            <div className="h-4 w-px bg-slate-300 mx-1"></div>
+                            <span className="text-slate-600 dark:text-slate-400">{formattedDate}</span>
+                        </>
+                    )}
+                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full ml-1 bg-indigo-100 text-indigo-600 hover:bg-indigo-200">
+                        <Search className="w-3 h-3" />
+                    </Button>
+                </div>
+
+                <div className="flex gap-2">
+                    <Button variant="ghost">Sign In</Button>
+                </div>
+            </div>
+        </header>
+    )
+}

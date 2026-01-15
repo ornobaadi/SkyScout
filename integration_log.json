@@ -1,0 +1,15 @@
+[
+    {
+        "type": "issue",
+        "severity": "critical",
+        "title": "Exposure of Mock Data in Production",
+        "description": "The logic in `app/api/flights/route.ts` was implemented correctly for the integration, but the UI is currently hitting `/api/flights` which proxies to Amadeus. However, the store fallback to MOCK_FLIGHTS was removed. This is GOOD for production, but we should make sure error handling doesn't purely crash.",
+        "status": "resolved"
+    },
+    {
+        "type": "improvement",
+        "title": "Date Handling in Search",
+        "description": "Amadeus requires YYYY-MM-DD. We added date-fns formatting in the API route. Ensure Client sends ISO or similar valid Date string.",
+        "status": "implemented"
+    }
+]
