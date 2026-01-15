@@ -67,7 +67,7 @@ export function FilterSidebar() {
                     min={priceRange.min}
                     max={priceRange.max}
                     step={10}
-                    onValueChange={(val) => setFilter('maxPrice', val[0])}
+                    onValueChange={(val) => setFilter('maxPrice', Array.isArray(val) ? val[0] : val)}
                     className="cursor-pointer"
                 />
                 <div className="flex justify-between text-xs text-slate-500">

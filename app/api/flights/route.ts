@@ -118,20 +118,15 @@ export async function GET(request: Request) {
         return NextResponse.json({ flights });
 
     } catch (error: any) {
-        console.error('Amadeus API Error:', error);
-        
-        // Extract error message from various possible error structures
-        let errorMessage = 'Failed to fetch flights';
-        
-        if (error.response?.statusCode === 401) {
-            errorMessage = 'API authentication failed. Please check your credentials.';
-        } else if (error.description && Array.isArray(error.description)) {
-            errorMessage = error.description.map((d: any) => d.detail || d.title).join(', ');
-        } else if (error.description) {
-            errorMessage = error.description;
-        } else if (error.message) {
-            errorMessage = error.message;
+        // Only log detailed errors in development
+        if (process.env.NODE_ENV === 'development') {
+            console.error('Flight API Error:', error.message);
         }
+        
+        // Return generic error message in production
+        const errorMessage = error.response?.statusCode === 401 
+            ? 'Authentication failed' 
+            : 'Failed to fetch flights';
         
         return NextResponse.json(
             { error: errorMessage },

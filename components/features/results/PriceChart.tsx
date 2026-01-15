@@ -85,8 +85,8 @@ export function PriceChart() {
                             boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
                             padding: '12px'
                         }}
-                        formatter={(val: number, name: string, props: any) => [
-                            `$${val.toFixed(0)}`,
+                        formatter={(val: number | undefined, name: string | undefined, props: any) => [
+                            `$${val?.toFixed(0) ?? '0'}`,
                             `${props.payload.airline} • ${props.payload.stops === 0 ? 'Direct' : `${props.payload.stops} stop${props.payload.stops > 1 ? 's' : ''}`}`
                         ]}
                         labelStyle={{ color: '#64748b', fontWeight: 600, marginBottom: '4px' }}

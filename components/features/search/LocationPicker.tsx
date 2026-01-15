@@ -84,7 +84,7 @@ export function LocationPicker({ label, value, onChange, placeholder }: Location
                 }}
             >
                 <ComboboxTrigger className="w-full h-10 px-3 py-2 border rounded-md flex items-center justify-between text-sm bg-white cursor-text hover:bg-slate-50">
-                    <ComboboxValue placeholder={placeholder}>
+                    <ComboboxValue>
                         {value ? value : placeholder}
                     </ComboboxValue>
                 </ComboboxTrigger>
@@ -94,7 +94,7 @@ export function LocationPicker({ label, value, onChange, placeholder }: Location
                     <ComboboxInput
                         placeholder="Type city or airport..."
                         value={inputValue}
-                        onValueChange={setInputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
                         className="border-0 focus:ring-0 px-3 py-2"
                     />
                     <ComboboxList className="max-h-[300px] overflow-y-auto">
@@ -112,8 +112,8 @@ export function LocationPicker({ label, value, onChange, placeholder }: Location
                             <div className="py-2 text-center text-sm text-slate-400">Type at least 2 characters</div>
                         )}
 
-                        {!loading && results.map((loc) => (
-                            <ComboboxItem key={`${loc.code}-${loc.type}`} value={loc.code} label={loc.city} className="px-4 py-2 cursor-pointer hover:bg-slate-50">
+                        {!loading && results.map((loc, idx) => (
+                            <ComboboxItem key={`${loc.code}-${idx}`} value={loc.code} className="px-4 py-2 cursor-pointer hover:bg-slate-50">
                                 <div className="flex flex-col items-start gap-0.5">
                                     <div className="flex items-center gap-2">
                                         <span className="font-semibold text-slate-900">{loc.city}</span>

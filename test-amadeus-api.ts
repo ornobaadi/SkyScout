@@ -14,7 +14,6 @@ const AMADEUS_CLIENT_SECRET = process.env.AMADEUS_CLIENT_SECRET;
 const BASE_URL = 'https://test.api.amadeus.com';
 
 console.log('🔧 Testing Amadeus API...\n');
-console.log('Client ID:', AMADEUS_CLIENT_ID?.substring(0, 10) + '...');
 console.log('Base URL:', BASE_URL);
 console.log('─'.repeat(60));
 
@@ -43,9 +42,7 @@ async function getAccessToken(): Promise<string> {
 
     const data = await response.json();
     console.log('✅ Access token obtained successfully');
-    console.log('   Token type:', data.type);
     console.log('   Expires in:', data.expires_in, 'seconds');
-    console.log('   Token (first 20 chars):', data.access_token.substring(0, 20) + '...');
     
     return data.access_token;
 }

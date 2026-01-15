@@ -67,7 +67,9 @@ export function LocationInput({ value, onChange, onSelect, displayValue, onDispl
                 const data = await res.json()
                 setResults(data.locations || [])
             } catch (error) {
-                console.error("Failed to fetch locations", error)
+                if (process.env.NODE_ENV === 'development') {
+                    console.error("Failed to fetch locations", error)
+                }
                 setResults([])
             } finally {
                 setLoading(false)
