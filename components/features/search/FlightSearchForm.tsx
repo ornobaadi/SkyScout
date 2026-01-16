@@ -15,8 +15,13 @@ import {
 import { useSearchStore } from "@/store/use-search-store"
 import { LocationInput } from "./LocationInput"
 import { Separator } from "@/components/ui/separator"
+import { FlightSearchIntent } from "@/lib/openrouter-client"
 
-export function FlightSearchForm() {
+export interface FlightSearchFormRef {
+    applyAIIntent: (intent: FlightSearchIntent) => void;
+}
+
+export const FlightSearchForm = React.forwardRef<FlightSearchFormRef, {}>(function FlightSearchForm(_props, ref) {
     const router = useRouter()
     const { setSearchParams } = useSearchStore()
 
@@ -63,6 +68,72 @@ export function FlightSearchForm() {
         setDestination(tempCode)
         setDestinationDisplay(tempDisplay)
     }
+
+    // Expose method to parent via ref
+    React.useImperativeHandle(ref, () => ({
+        applyAIIntent: (intent: FlightSearchIntent) => {
+            // Apply origin
+            if (intent.origin) {
+                setOrigin(intent.origin)
+                setOriginDisplay(intent.origin)
+            }
+            
+            // Apply destination
+            if (intent.destination) {
+                setDestination(intent.destination)
+                setDestinationDisplay(intent.destination)
+            }
+            
+            // Apply departure date
+            if (intent.departureDate) {
+                try {
+                    const parsedDate = new Date(intent.departureDate)
+                    if (!isNaN(parsedDate.getTime())) {
+                        setDate(parsedDate)
+                    }
+                } catch (e) {
+                    console.error('Invalid departure date:', intent.departureDate)
+                }
+            }
+            
+            // Apply return date
+            if (intent.returnDate) {
+                try {
+                    const parsedReturnDate = new Date(intent.returnDate)
+                    if (!isNaN(parsedReturnDate.getTime())) {
+                        setReturnDate(parsedReturnDate)
+                        setTripType('round-trip')
+                    }
+                } catch (e) {
+                    console.error('Invalid return date:', intent.returnDate)
+                }
+            } else if (intent.departureDate && !intent.returnDate) {
+                setTripType('one-way')
+            }
+            
+            // Apply passengers
+            if (intent.adults && intent.adults >= 1 && intent.adults <= 6) {
+                setPassengers(intent.adults)
+            }
+            
+            // Apply travel class
+            if (intent.travelClass) {
+                const classMap: Record<string, typeof cabin> = {
+                    'ECONOMY': 'Economy',
+                    'PREMIUM_ECONOMY': 'Premium Economy',
+                    'BUSINESS': 'Business',
+                    'FIRST': 'First'
+                }
+                const mappedClass = classMap[intent.travelClass]
+                if (mappedClass) {
+                    setCabin(mappedClass)
+                }
+            }
+
+            // Smooth scroll to form
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+    }))
 
     return (
         <div className="w-full max-w-5xl mx-auto">
@@ -357,4 +428,4 @@ export function FlightSearchForm() {
             </div>
         </div>
     )
-}
+})

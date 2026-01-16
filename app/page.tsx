@@ -1,7 +1,20 @@
+"use client"
+
+import * as React from "react"
 import { FlightSearchForm } from "@/components/features/search/FlightSearchForm";
+import { AISearchAssistant } from "@/components/features/search/AISearchAssistant";
+import { FlightSearchIntent } from "@/lib/openrouter-client";
 import { Plane } from "lucide-react";
 
 export default function Home() {
+    const searchFormRef = React.useRef<{ applyAIIntent: (intent: FlightSearchIntent) => void }>(null)
+
+    const handleAIIntent = (intent: FlightSearchIntent) => {
+        if (searchFormRef.current) {
+            searchFormRef.current.applyAIIntent(intent)
+        }
+    }
+
     return (
         <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-indigo-50 via-white to-blue-50 dark:from-slate-900 dark:to-slate-800 relative overflow-hidden">
 
@@ -19,8 +32,11 @@ export default function Home() {
             </div>
 
             <div className="w-full max-w-4xl z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-                <FlightSearchForm />
+                <FlightSearchForm ref={searchFormRef} />
             </div>
+
+            {/* AI Search Assistant */}
+            <AISearchAssistant onSearchIntent={handleAIIntent} />
         </main>
     );
 }

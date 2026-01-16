@@ -38,29 +38,29 @@ export function FilterSidebar() {
     }, [allFlights]);
 
     return (
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6 sticky top-20">
+        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm p-6 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 shadow-sm sticky top-20 space-y-6">
             <div className="flex items-center justify-between">
-                <h3 className="font-bold text-lg text-slate-900 dark:text-white">Filters</h3>
+                <h3 className="font-semibold text-lg text-slate-900 dark:text-white">Filters</h3>
                 <Button 
                     variant="ghost" 
                     size="sm" 
                     onClick={resetFilters} 
-                    className="text-indigo-600 hover:text-indigo-700 h-auto p-1 hover:bg-indigo-50 rounded-md font-medium text-sm"
+                    className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 h-auto p-1 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-md font-medium text-sm"
                 >
                     Reset
                 </Button>
             </div>
 
             {/* Results Count */}
-            <div className="text-sm text-slate-600 dark:text-slate-400 pb-2 border-b border-slate-100 dark:border-slate-700">
-                {allFlights.length} flights found
+            <div className="text-sm text-slate-600 dark:text-slate-400 pb-3 border-b border-slate-100 dark:border-slate-700/50">
+                <span className="font-medium text-slate-900 dark:text-white">{allFlights.length}</span> flights available
             </div>
 
             {/* Price */}
-            <div className="space-y-3">
+            <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <Label className="font-semibold text-slate-700 dark:text-slate-300">Max Price</Label>
-                    <span className="text-lg font-bold text-indigo-600">${filters.maxPrice}</span>
+                    <Label className="font-medium text-slate-700 dark:text-slate-300 text-sm">Max Price</Label>
+                    <span className="text-xl font-bold text-indigo-600 dark:text-indigo-400">${filters.maxPrice}</span>
                 </div>
                 <Slider
                     value={[filters.maxPrice]}
@@ -70,22 +70,22 @@ export function FilterSidebar() {
                     onValueChange={(val) => setFilter('maxPrice', Array.isArray(val) ? val[0] : val)}
                     className="cursor-pointer"
                 />
-                <div className="flex justify-between text-xs text-slate-500">
+                <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
                     <span>${priceRange.min}</span>
                     <span>${priceRange.max}</span>
                 </div>
             </div>
 
             {/* Stops */}
-            <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-700">
-                <Label className="font-semibold text-slate-700 dark:text-slate-300">Stops</Label>
-                <div className="space-y-3">
+            <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-700/50">
+                <Label className="font-medium text-slate-700 dark:text-slate-300 text-sm">Number of Stops</Label>
+                <div className="space-y-2">
                     {[
-                        { val: 0, label: "Direct", badge: "Fastest" },
-                        { val: 1, label: "1 Stop", badge: null },
-                        { val: 2, label: "2+ Stops", badge: "Cheapest" }
+                        { val: 0, label: "Nonstop" },
+                        { val: 1, label: "1 Stop" },
+                        { val: 2, label: "2+ Stops" }
                     ].map((opt) => (
-                        <div key={opt.val} className="flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-700/50 p-2 rounded-lg transition-colors cursor-pointer">
+                        <div key={opt.val} className="flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-800/50 p-2.5 rounded-lg transition-colors cursor-pointer">
                             <div className="flex items-center space-x-3">
                                 <Checkbox
                                     id={`stop-${opt.val}`}
@@ -101,9 +101,9 @@ export function FilterSidebar() {
                                         setFilter('stops', next.length === 3 ? null : next);
                                     }}
                                 />
-                                <Label htmlFor={`stop-${opt.val}`} className="font-normal cursor-pointer">{opt.label}</Label>
+                                <Label htmlFor={`stop-${opt.val}`} className="font-normal cursor-pointer text-sm">{opt.label}</Label>
                             </div>
-                            <span className="text-xs text-slate-400 group-hover:text-slate-600">
+                            <span className="text-xs text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 font-medium">
                                 {allFlights.filter(f => opt.val === 2 ? f.stops >= 2 : f.stops === opt.val).length}
                             </span>
                         </div>
@@ -112,14 +112,14 @@ export function FilterSidebar() {
             </div>
 
             {/* Airlines */}
-            <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-700">
-                <Label className="font-semibold text-slate-700 dark:text-slate-300">Airlines</Label>
-                <div className="space-y-2 max-h-64 overflow-y-auto pr-2 -mr-2">
+            <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-700/50">
+                <Label className="font-medium text-slate-700 dark:text-slate-300 text-sm">Airlines</Label>
+                <div className="space-y-1.5 max-h-64 overflow-y-auto pr-2 -mr-2 scrollbar-thin">
                     {AIRLINES.length === 0 ? (
-                        <div className="text-sm text-slate-400 py-2">No airlines available</div>
+                        <div className="text-sm text-slate-400 dark:text-slate-500 py-2">No airlines available</div>
                     ) : (
                         AIRLINES.map((airline) => (
-                            <div key={airline.id} className="flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-700/50 p-2 rounded-lg transition-colors cursor-pointer">
+                            <div key={airline.id} className="flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-800/50 p-2.5 rounded-lg transition-colors cursor-pointer">
                                 <div className="flex items-center space-x-3 flex-1 min-w-0">
                                     <Checkbox
                                         id={`al-${airline.id}`}
@@ -135,9 +135,9 @@ export function FilterSidebar() {
                                             setFilter('airlines', next);
                                         }}
                                     />
-                                    <Label htmlFor={`al-${airline.id}`} className="font-normal cursor-pointer truncate flex-1">{airline.label}</Label>
+                                    <Label htmlFor={`al-${airline.id}`} className="font-normal cursor-pointer truncate flex-1 text-sm">{airline.label}</Label>
                                 </div>
-                                <span className="text-xs text-slate-400 group-hover:text-slate-600 shrink-0">
+                                <span className="text-xs text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 shrink-0 font-medium">
                                     {airline.count}
                                 </span>
                             </div>
