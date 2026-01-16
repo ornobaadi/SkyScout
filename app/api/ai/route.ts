@@ -4,7 +4,15 @@ import { getOpenRouterClient } from '@/lib/openrouter-client';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { query, action = 'extract' } = body;
+        const { query, action = 'extract', message } = body;
+
+        const client = getOpenRouterClient();
+
+        // Handle simple message requests (for coordinate fetching, etc.)
+        if (message) {
+            const response = await client.generateResponse(message);
+            return NextResponse.json({ response });
+        }
 
         if (!query || typeof query !== 'string') {
             return NextResponse.json(
@@ -12,8 +20,6 @@ export async function POST(request: Request) {
                 { status: 400 }
             );
         }
-
-        const client = getOpenRouterClient();
 
         if (action === 'extract') {
             // Extract flight search intent from natural language

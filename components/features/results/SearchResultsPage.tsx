@@ -5,6 +5,7 @@ import { useSearchStore } from "@/store/use-search-store"
 import { FilterSidebar } from "./FilterSidebar"
 import { PriceChart } from "./PriceChart"
 import { FlightList } from "./FlightList"
+import { FlightRouteMap } from "./FlightRouteMap"
 import { SearchHeader } from "@/components/layout/SearchHeader"
 
 export function SearchResultsPage({
@@ -74,6 +75,21 @@ export function SearchResultsPage({
                                     </p>
                                 </div>
                             </div>
+                        )}
+
+                        {/* Flight Route Map Section */}
+                        {initialOrigin && initialDestination && (
+                            <section className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-6 shadow-sm hover:shadow-md transition-shadow">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Flight Route</h2>
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">{initialOrigin} → {initialDestination}</span>
+                                </div>
+                                <FlightRouteMap 
+                                    origin={initialOrigin} 
+                                    destination={initialDestination}
+                                    className="h-96"
+                                />
+                            </section>
                         )}
 
                         {/* Price Chart Section */}
