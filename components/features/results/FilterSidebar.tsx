@@ -38,6 +38,8 @@ export function FilterSidebar() {
         };
     }, [allFlights]);
 
+    const maxPriceValue = Math.min(filters.maxPrice, priceRange.max);
+
     if (isLoading) {
         return (
             <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm p-6 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 shadow-sm sticky top-20 space-y-6">
@@ -97,10 +99,10 @@ export function FilterSidebar() {
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
                     <Label className="font-medium text-slate-700 dark:text-slate-300 text-sm">Max Price</Label>
-                    <span className="text-xl font-bold text-indigo-600 dark:text-indigo-400">${filters.maxPrice}</span>
+                    <span className="text-xl font-bold text-indigo-600 dark:text-indigo-400">${maxPriceValue}</span>
                 </div>
                 <Slider
-                    value={[filters.maxPrice]}
+                    value={[maxPriceValue]}
                     min={priceRange.min}
                     max={priceRange.max}
                     step={10}

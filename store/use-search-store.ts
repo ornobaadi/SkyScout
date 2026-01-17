@@ -102,7 +102,7 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
                 filteredFlights: flights,
                 filters: {
                     ...get().filters,
-                    maxPrice: Math.ceil(maxPriceInResults) + 20
+                    maxPrice: Math.ceil(maxPriceInResults)
                 },
                 isLoading: false
             });

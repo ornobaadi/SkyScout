@@ -25,7 +25,7 @@ function Slider({
 
   return (
     <SliderPrimitive.Root
-      className="data-horizontal:w-full data-vertical:h-full"
+      className="w-full data-horizontal:w-full data-vertical:h-full"
       data-slot="slider"
       defaultValue={defaultValue}
       value={value}
