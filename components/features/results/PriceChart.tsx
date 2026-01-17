@@ -54,8 +54,10 @@ export function PriceChart() {
 
     if (data.length === 0) return (
         <div className="flex flex-col items-center justify-center h-full text-slate-400 dark:text-slate-500">
-            <div className="text-4xl mb-3">📊</div>
-            <p className="text-sm">No price data available</p>
+            <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
+                <TrendingDown className="w-7 h-7 text-slate-400 dark:text-slate-500" />
+            </div>
+            <p className="text-sm font-medium">No price data available</p>
             <p className="text-xs mt-1">Try different search criteria</p>
         </div>
     );

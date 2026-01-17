@@ -13,7 +13,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useMemo } from "react";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, Filter, RefreshCw, DollarSign, GitBranch, Building2, Users, Sparkles } from "lucide-react";
 import { getPriceForSearch } from "@/lib/api/pricing";
 
 export function FilterSidebar() {
@@ -54,32 +54,85 @@ export function FilterSidebar() {
     if (isLoading) {
         return (
             <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm p-6 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 shadow-sm sticky top-20 space-y-6">
+                {/* Header Skeleton */}
                 <div className="flex items-center justify-between">
-                    <Skeleton className="h-6 w-16" />
-                    <Skeleton className="h-6 w-12" />
-                </div>
-                
-                <div className="space-y-2">
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-8 w-full" />
+                    <div className="flex items-center gap-2">
+                        <Filter className="w-4 h-4 text-slate-300 dark:text-slate-600" />
+                        <Skeleton className="h-6 w-16" />
+                    </div>
+                    <Skeleton className="h-6 w-12 rounded-md" />
                 </div>
 
-                <div className="space-y-3">
-                    <Skeleton className="h-5 w-28" />
-                    {[1, 2, 3].map(i => (
-                        <div key={i} className="flex items-center gap-2">
-                            <Skeleton className="h-4 w-4 rounded" />
+                {/* Count Skeleton */}
+                <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-700/50">
+                    <Skeleton className="h-4 w-8" />
+                    <Skeleton className="h-4 w-24" />
+                </div>
+
+                {/* Travelers & Cabin Skeleton */}
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                            <Users className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600" />
+                            <Skeleton className="h-4 w-20" />
+                        </div>
+                        <Skeleton className="h-10 w-full rounded-lg" />
+                    </div>
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                            <Sparkles className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600" />
                             <Skeleton className="h-4 w-24" />
+                        </div>
+                        <Skeleton className="h-10 w-full rounded-lg" />
+                    </div>
+                </div>
+
+                {/* Price Slider Skeleton */}
+                <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <DollarSign className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600" />
+                            <Skeleton className="h-4 w-20" />
+                        </div>
+                        <Skeleton className="h-6 w-16" />
+                    </div>
+                    <Skeleton className="h-2 w-full rounded-full" />
+                    <div className="flex justify-between">
+                        <Skeleton className="h-3 w-10" />
+                        <Skeleton className="h-3 w-10" />
+                    </div>
+                </div>
+
+                {/* Stops Skeleton */}
+                <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-700/50">
+                    <div className="flex items-center gap-2">
+                        <GitBranch className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600" />
+                        <Skeleton className="h-4 w-28" />
+                    </div>
+                    {[1, 2, 3].map(i => (
+                        <div key={i} className="flex items-center justify-between p-2.5 rounded-lg">
+                            <div className="flex items-center gap-3">
+                                <Skeleton className="h-4 w-4 rounded" />
+                                <Skeleton className="h-4 w-20" />
+                            </div>
+                            <Skeleton className="h-4 w-6" />
                         </div>
                     ))}
                 </div>
 
-                <div className="space-y-3">
-                    <Skeleton className="h-5 w-20" />
+                {/* Airlines Skeleton */}
+                <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-700/50">
+                    <div className="flex items-center gap-2">
+                        <Building2 className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600" />
+                        <Skeleton className="h-4 w-16" />
+                    </div>
                     {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="flex items-center gap-2">
-                            <Skeleton className="h-4 w-4 rounded" />
-                            <Skeleton className="h-4 w-32" />
+                        <div key={i} className="flex items-center justify-between p-2.5 rounded-lg">
+                            <div className="flex items-center gap-3">
+                                <Skeleton className="h-4 w-4 rounded" />
+                                <Skeleton className="h-4 w-28" />
+                            </div>
+                            <Skeleton className="h-4 w-6" />
                         </div>
                     ))}
                 </div>

@@ -1,14 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useSearchStore } from "@/store/use-search-store"
 import { FilterSidebar } from "./FilterSidebar"
 import { PriceChart } from "./PriceChart"
 import { FlightList } from "./FlightList"
 import { FlightRouteMap } from "./FlightRouteMap"
 import { SearchHeader } from "@/components/layout/SearchHeader"
-import { AISearchAssistant } from "@/components/features/search/AISearchAssistant"
-import { FlightSearchIntent } from "@/lib/ai-types"
+import { InlineSearchForm, InlineSearchFormSkeleton } from "@/components/features/search/InlineSearchForm"
 import type { CabinClass } from "@/lib/api/types"
 
 export function SearchResultsPage({
@@ -26,7 +25,7 @@ export function SearchResultsPage({
 }) {
     const setSearchParams = useSearchStore((state) => state.setSearchParams)
     const searchFlights = useSearchStore((state) => state.searchFlights)
-    const filteredFlights = useSearchStore((state) => state.filteredFlights)
+    const searchParams = useSearchStore((state) => state.searchParams)
     const isLoading = useSearchStore((state) => state.isLoading)
     const [mounted, setMounted] = useState(false)
 
@@ -52,26 +51,9 @@ export function SearchResultsPage({
         return null
     }
 
-    const handleAIIntent = (intent: FlightSearchIntent) => {
-        if (intent.intent !== 'search') return
-
-        setSearchParams({
-            origin: intent.origin || '',
-            destination: intent.destination || '',
-            departureDate: intent.departureDate ? new Date(intent.departureDate) : undefined,
-            returnDate: intent.returnDate ? new Date(intent.returnDate) : undefined,
-            passengers: intent.adults || 1,
-            cabinClass: intent.travelClass === 'PREMIUM_ECONOMY'
-                ? 'Premium Economy'
-                : intent.travelClass === 'BUSINESS'
-                    ? 'Business'
-                    : intent.travelClass === 'FIRST'
-                        ? 'First'
-                        : 'Economy'
-        })
-
-        searchFlights()
-    }
+    // Get current display values from store (these update in real-time)
+    const displayOrigin = searchParams.origin || initialOrigin
+    const displayDestination = searchParams.destination || initialDestination
 
     return (
         <div className="min-h-screen bg-linear-to-br from-indigo-50/30 via-white to-blue-50/30 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-950">
@@ -83,75 +65,55 @@ export function SearchResultsPage({
                 <div className="absolute bottom-[20%] left-[10%] w-100 h-100 rounded-full bg-blue-100/20 dark:bg-blue-500/5 blur-3xl" />
             </div>
 
-            <main className="container mx-auto max-w-7xl px-4 py-8 relative z-10">
+            <main className="container mx-auto max-w-7xl px-4 py-6 relative z-10 space-y-6">
+                {/* Inline Search Form - Modify search without going back to homepage */}
+                <Suspense fallback={<InlineSearchFormSkeleton />}>
+                    <InlineSearchForm />
+                </Suspense>
+
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
                     {/* Filters Sidebar */}
-                    <aside className="lg:col-span-3">
+                    <aside className="lg:col-span-3 order-2 lg:order-1">
                         <FilterSidebar />
                     </aside>
 
                     {/* Main Content */}
-                    <div className="lg:col-span-9">
-
-                        {/* Results Summary */}
-                        {isLoading ? (
-                            <div className="flex items-center justify-between">
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-5 h-5 border-2 border-indigo-600 dark:border-indigo-400 border-t-transparent rounded-full animate-spin" />
-                                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white font-display">
-                                            Searching Flights...
-                                        </h1>
-                                    </div>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                                        {initialOrigin} → {initialDestination}
-                                    </p>
-                                </div>
-                            </div>
-                        ) : filteredFlights.length > 0 && (
-                            <div className="flex items-center justify-between">
-                            </div>
-                        )}
+                    <div className="lg:col-span-9 order-1 lg:order-2 space-y-6">
 
                         {/* Flight Route Map Section */}
-                        {initialOrigin && initialDestination && (
-                            <section className={`${isLoading ? 'mt-6' : ''} bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-6 shadow-sm hover:shadow-md transition-shadow`}>
+                        {displayOrigin && displayDestination && (
+                            <section className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-6 shadow-sm hover:shadow-md transition-shadow">
                                 <div className="flex justify-between items-center mb-6">
                                     <h2 className="text-lg font-semibold text-slate-900 dark:text-white font-display">Flight Route</h2>
-                                    <span className="text-xs text-slate-500 dark:text-slate-400">{initialOrigin} → {initialDestination}</span>
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">{displayOrigin} → {displayDestination}</span>
                                 </div>
                                 <FlightRouteMap 
-                                    origin={initialOrigin} 
-                                    destination={initialDestination}
-                                    className="h-96"
+                                    origin={displayOrigin} 
+                                    destination={displayDestination}
+                                    className="h-80"
                                 />
                             </section>
                         )}
 
                         {/* Price Chart Section */}
-                        <section className="mt-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <section className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-6 shadow-sm hover:shadow-md transition-shadow">
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-lg font-semibold text-slate-900 dark:text-white font-display">Price Overview</h2>
                                 <span className="text-xs text-slate-500 dark:text-slate-400">By departure time</span>
                             </div>
-                            <div className="h-72">
+                            <div className="h-64">
                                 <PriceChart />
                             </div>
                         </section>
 
                         {/* Flight List Section */}
-                        <section className="mt-6">
+                        <section>
                             <FlightList />
                         </section>
                     </div>
                 </div>
             </main>
-
-            <AISearchAssistant
-                onSearchIntent={handleAIIntent}
-                className="fixed bottom-6 right-6 z-50"
-            />
         </div>
     )
 }
