@@ -5,11 +5,12 @@ import { FlightCard } from "./FlightCard";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Clock, DollarSign, Plane } from "lucide-react";
 import { useState, useMemo } from "react";
+import { getPriceForSearch } from "@/lib/api/pricing";
 
 type SortOption = 'price' | 'duration' | 'departure' | 'stops';
 
 export function FlightList() {
-    const { filteredFlights, isLoading, error } = useSearchStore();
+    const { filteredFlights, isLoading, error, searchParams } = useSearchStore();
     const [sortBy, setSortBy] = useState<SortOption>('price');
 
     // Sort flights
@@ -17,7 +18,10 @@ export function FlightList() {
         const flights = [...filteredFlights];
         switch (sortBy) {
             case 'price':
-                return flights.sort((a, b) => a.price - b.price);
+                return flights.sort((a, b) =>
+                    getPriceForSearch(a, searchParams.passengers, searchParams.cabinClass) -
+                    getPriceForSearch(b, searchParams.passengers, searchParams.cabinClass)
+                );
             case 'duration':
                 return flights.sort((a, b) => a.duration - b.duration);
             case 'departure':

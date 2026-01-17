@@ -110,7 +110,7 @@ Response: {"destination":"Europe","adults":1,"travelClass":"ECONOMY","intent":"r
 
         try {
             return JSON.parse(cleanContent);
-        } catch (error) {
+        } catch {
             console.error("Failed to parse AI response:", cleanContent);
             return { intent: "search" };
         }

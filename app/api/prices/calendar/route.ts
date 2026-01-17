@@ -27,8 +27,10 @@ function buildCacheKey(params: {
     month: string
     tripType: string
     tripDuration: number
+    adults: string
+    travelClass?: string
 }) {
-    return `${params.origin}-${params.destination}-${params.month}-${params.tripType}-${params.tripDuration}`
+    return `${params.origin}-${params.destination}-${params.month}-${params.tripType}-${params.tripDuration}-${params.adults}-${params.travelClass || "ECONOMY"}`
 }
 
 // Fetch cheapest price for a single date using flightOffersSearch
@@ -36,19 +38,25 @@ async function fetchSingleDatePrice(
     origin: string,
     destination: string,
     departureDate: string,
-    returnDate?: string
+    returnDate?: string,
+    adults: string = "1",
+    travelClass?: string
 ): Promise<number | null> {
     try {
         const params: Record<string, string> = {
             originLocationCode: origin,
             destinationLocationCode: destination,
             departureDate,
-            adults: "1",
+            adults,
             max: "1",
         }
 
         if (returnDate) {
             params.returnDate = returnDate
+        }
+
+        if (travelClass) {
+            params.travelClass = travelClass
         }
 
         const response = await amadeus.shopping.flightOffersSearch.get(params)
@@ -73,6 +81,8 @@ async function fetchPriceCalendar(params: {
     month: string
     tripType: "one-way" | "round-trip"
     tripDuration: number
+    adults: string
+    travelClass?: string
 }): Promise<Record<string, number>> {
     const parsedMonth = parse(`${params.month}-01`, "yyyy-MM-dd", new Date())
 
@@ -128,7 +138,9 @@ async function fetchPriceCalendar(params: {
                 params.origin, 
                 params.destination, 
                 dateStr,
-                returnDateStr
+                returnDateStr,
+                params.adults,
+                params.travelClass
             )
             return { date: dateStr, price }
         })
@@ -180,12 +192,14 @@ export async function GET(request: Request) {
     const month = searchParams.get("month")
     const tripType = (searchParams.get("tripType") || "one-way") as "one-way" | "round-trip"
     const tripDuration = parseInt(searchParams.get("tripDuration") || "7", 10)
+    const adults = searchParams.get("adults") || "1"
+    const travelClass = searchParams.get("travelClass") || undefined
 
     if (!origin || !destination || !month) {
         return NextResponse.json({ error: "Missing required parameters" }, { status: 400 })
     }
 
-    const cacheKey = buildCacheKey({ origin, destination, month, tripType, tripDuration })
+    const cacheKey = buildCacheKey({ origin, destination, month, tripType, tripDuration, adults, travelClass })
     const now = Date.now()
     const cached = priceCalendarCache.get(cacheKey)
 
@@ -204,7 +218,7 @@ export async function GET(request: Request) {
 
     if (cached && cached.refreshUntil > now) {
         if (!cached.refreshing) {
-            cached.refreshing = fetchPriceCalendar({ origin, destination, month, tripType, tripDuration })
+            cached.refreshing = fetchPriceCalendar({ origin, destination, month, tripType, tripDuration, adults, travelClass })
                 .then((data) => {
                     priceCalendarCache.set(cacheKey, {
                         data,
@@ -232,7 +246,7 @@ export async function GET(request: Request) {
     }
 
     try {
-        const prices = await fetchPriceCalendar({ origin, destination, month, tripType, tripDuration })
+        const prices = await fetchPriceCalendar({ origin, destination, month, tripType, tripDuration, adults, travelClass })
 
         priceCalendarCache.set(cacheKey, {
             data: prices,

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { Flight, SearchParams, FilterState } from '@/lib/api/types';
+import { getPriceForSearch } from '@/lib/api/pricing';
 import { MOCK_FLIGHTS } from '@/lib/api/mock-data';
 
 interface SearchStore {
@@ -37,6 +38,7 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
         departureDate: undefined,
         returnDate: undefined,
         passengers: 1,
+        cabinClass: 'Economy',
     },
 
     allFlights: [],
@@ -50,6 +52,26 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
         set((state) => ({
             searchParams: { ...state.searchParams, ...params },
         }));
+
+        const { allFlights, filters, searchParams } = get();
+        if (allFlights.length > 0) {
+            const maxPriceInResults = Math.max(
+                ...allFlights.map((flight) =>
+                    getPriceForSearch(
+                        flight,
+                        searchParams.passengers,
+                        searchParams.cabinClass
+                    )
+                )
+            );
+            set({
+                filters: {
+                    ...filters,
+                    maxPrice: Math.ceil(maxPriceInResults),
+                },
+            });
+        }
+        get().applyFilters();
     },
 
     setFilter: (key, value) => {
@@ -66,7 +88,7 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
 
     searchFlights: async () => {
         set({ isLoading: true, error: null });
-        const { origin, destination, departureDate } = get().searchParams;
+        const { origin, destination, departureDate, passengers, cabinClass } = get().searchParams;
 
         if (!origin || !destination || !departureDate) {
             set({ isLoading: false, error: 'Please select origin, destination and date.' });
@@ -77,7 +99,16 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
             const params = new URLSearchParams({
                 origin,
                 destination,
-                date: departureDate instanceof Date ? departureDate.toISOString() : departureDate
+                date: departureDate instanceof Date ? departureDate.toISOString() : departureDate,
+                adults: String(passengers),
+                travelClass:
+                    cabinClass === 'Premium Economy'
+                        ? 'PREMIUM_ECONOMY'
+                        : cabinClass === 'Business'
+                            ? 'BUSINESS'
+                            : cabinClass === 'First'
+                                ? 'FIRST'
+                                : 'ECONOMY'
             });
 
             const res = await fetch(`/api/flights?${params.toString()}`);
@@ -95,7 +126,11 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
             }
 
             // Calculate dynamic max price from results
-            const maxPriceInResults = Math.max(...flights.map(f => f.price));
+            const maxPriceInResults = Math.max(
+                ...flights.map((flight) =>
+                    getPriceForSearch(flight, passengers, cabinClass)
+                )
+            );
 
             set({
                 allFlights: flights,
@@ -112,11 +147,14 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
     },
 
     applyFilters: () => {
-        const { allFlights, filters } = get();
+        const { allFlights, filters, searchParams } = get();
+        const { passengers, cabinClass } = searchParams;
 
         const filtered = allFlights.filter((flight) => {
+            const effectivePrice = getPriceForSearch(flight, passengers, cabinClass);
+
             // Price Filter
-            if (flight.price > filters.maxPrice) return false;
+            if (effectivePrice > filters.maxPrice) return false;
 
             // Stops Filter
             if (filters.stops && filters.stops.length > 0) {

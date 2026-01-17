@@ -9,15 +9,20 @@ import { FlightRouteMap } from "./FlightRouteMap"
 import { SearchHeader } from "@/components/layout/SearchHeader"
 import { AISearchAssistant } from "@/components/features/search/AISearchAssistant"
 import { FlightSearchIntent } from "@/lib/ai-types"
+import type { CabinClass } from "@/lib/api/types"
 
 export function SearchResultsPage({
     initialOrigin,
     initialDestination,
-    initialDate
+    initialDate,
+    initialPassengers,
+    initialCabinClass
 }: {
     initialOrigin?: string,
     initialDestination?: string,
-    initialDate?: string
+    initialDate?: string,
+    initialPassengers?: number,
+    initialCabinClass?: CabinClass
 }) {
     const setSearchParams = useSearchStore((state) => state.setSearchParams)
     const searchFlights = useSearchStore((state) => state.searchFlights)
@@ -35,11 +40,13 @@ export function SearchResultsPage({
             origin: initialOrigin || '',
             destination: initialDestination || '',
             departureDate: initialDate ? new Date(initialDate) : undefined,
+            passengers: initialPassengers || 1,
+            cabinClass: initialCabinClass || 'Economy'
         })
 
         // Trigger initial search
         searchFlights()
-    }, [initialOrigin, initialDestination, initialDate, setSearchParams, searchFlights])
+    }, [initialOrigin, initialDestination, initialDate, initialPassengers, initialCabinClass, setSearchParams, searchFlights])
 
     if (!mounted) {
         return null
@@ -54,19 +61,26 @@ export function SearchResultsPage({
             departureDate: intent.departureDate ? new Date(intent.departureDate) : undefined,
             returnDate: intent.returnDate ? new Date(intent.returnDate) : undefined,
             passengers: intent.adults || 1,
+            cabinClass: intent.travelClass === 'PREMIUM_ECONOMY'
+                ? 'Premium Economy'
+                : intent.travelClass === 'BUSINESS'
+                    ? 'Business'
+                    : intent.travelClass === 'FIRST'
+                        ? 'First'
+                        : 'Economy'
         })
 
         searchFlights()
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50/30 via-white to-blue-50/30 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-950">
+        <div className="min-h-screen bg-linear-to-br from-indigo-50/30 via-white to-blue-50/30 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-950">
             <SearchHeader />
 
             {/* Decorative background elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-                <div className="absolute top-[10%] right-[5%] w-[500px] h-[500px] rounded-full bg-indigo-100/30 dark:bg-indigo-500/5 blur-3xl" />
-                <div className="absolute bottom-[20%] left-[10%] w-[400px] h-[400px] rounded-full bg-blue-100/20 dark:bg-blue-500/5 blur-3xl" />
+                <div className="absolute top-[10%] right-[5%] w-125 h-125 rounded-full bg-indigo-100/30 dark:bg-indigo-500/5 blur-3xl" />
+                <div className="absolute bottom-[20%] left-[10%] w-100 h-100 rounded-full bg-blue-100/20 dark:bg-blue-500/5 blur-3xl" />
             </div>
 
             <main className="container mx-auto max-w-7xl px-4 py-8 relative z-10">

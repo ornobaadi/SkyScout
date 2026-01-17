@@ -23,7 +23,10 @@ export interface FlightSearchFormRef {
     applyAIIntent: (intent: FlightSearchIntent) => void;
 }
 
-export const FlightSearchForm = React.forwardRef<FlightSearchFormRef, {}>(function FlightSearchForm(_props, ref) {
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+interface FlightSearchFormProps {}
+
+export const FlightSearchForm = React.forwardRef<FlightSearchFormRef, FlightSearchFormProps>(function FlightSearchForm(_props, ref) {
     const router = useRouter()
     const { setSearchParams } = useSearchStore()
 
@@ -55,7 +58,8 @@ export const FlightSearchForm = React.forwardRef<FlightSearchFormRef, {}>(functi
             destination,
             departureDate: date,
             returnDate: tripType === "round-trip" ? returnDate : undefined,
-            passengers
+            passengers,
+            cabinClass: cabin
         })
 
         const params = new URLSearchParams()
@@ -65,6 +69,8 @@ export const FlightSearchForm = React.forwardRef<FlightSearchFormRef, {}>(functi
         if (tripType === "round-trip" && returnDate) {
             params.set("returnDate", returnDate.toISOString())
         }
+        params.set("passengers", String(passengers))
+        params.set("cabinClass", cabin)
 
         router.push(`/search?${params.toString()}`)
     }
@@ -80,7 +86,7 @@ export const FlightSearchForm = React.forwardRef<FlightSearchFormRef, {}>(functi
             // Switching to round-trip with existing departure date
             setDateRange({ from: date, to: undefined })
         }
-    }, [tripType])
+    }, [tripType, date, dateRange])
 
     // Sync date with dateRange for round-trip
     React.useEffect(() => {
@@ -109,7 +115,15 @@ export const FlightSearchForm = React.forwardRef<FlightSearchFormRef, {}>(functi
                 const response = await fetch(
                     `/api/prices/calendar?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(
                         destination
-                    )}&month=${month}&tripType=${tripType}&tripDuration=${tripDuration}`
+                    )}&month=${month}&tripType=${tripType}&tripDuration=${tripDuration}&adults=${passengers}&travelClass=${encodeURIComponent(
+                        cabin === "Premium Economy"
+                            ? "PREMIUM_ECONOMY"
+                            : cabin === "Business"
+                                ? "BUSINESS"
+                                : cabin === "First"
+                                    ? "FIRST"
+                                    : "ECONOMY"
+                    )}`
                 )
 
                 const data = await response.json()
@@ -126,7 +140,7 @@ export const FlightSearchForm = React.forwardRef<FlightSearchFormRef, {}>(functi
         }, 350)
 
         return () => window.clearTimeout(timeout)
-    }, [origin, destination, calendarMonth, tripType, tripDuration])
+    }, [origin, destination, calendarMonth, tripType, tripDuration, passengers, cabin])
 
     const handleSwap = () => {
         const tempCode = origin
@@ -162,7 +176,7 @@ export const FlightSearchForm = React.forwardRef<FlightSearchFormRef, {}>(functi
                     } else {
                         parsedDepartureDate = undefined
                     }
-                } catch (e) {
+                } catch {
                     console.error('Invalid departure date:', intent.departureDate)
                 }
             }
@@ -180,7 +194,7 @@ export const FlightSearchForm = React.forwardRef<FlightSearchFormRef, {}>(functi
                             to: parsedReturnDate
                         })
                     }
-                } catch (e) {
+                } catch {
                     console.error('Invalid return date:', intent.returnDate)
                 }
             } else if (intent.departureDate && !intent.returnDate) {

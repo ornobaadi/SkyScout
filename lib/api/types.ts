@@ -81,12 +81,15 @@ export interface Flight {
     source?: string;
 }
 
+export type CabinClass = "Economy" | "Premium Economy" | "Business" | "First";
+
 export interface SearchParams {
     origin: string;
     destination: string;
     departureDate: Date | undefined;
     returnDate: Date | undefined;
     passengers: number;
+    cabinClass: CabinClass;
 }
 
 export interface FilterState {

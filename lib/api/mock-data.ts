@@ -21,6 +21,15 @@ const AIRLINES: Record<string, Airline> = {
     DL: { code: 'DL', name: 'Delta Air Lines', logo: '/logos/dl.png' },
 };
 
+function getAirport(code: string): Airport {
+    return AIRPORTS[code] || {
+        code,
+        city: code,
+        name: code,
+        country: ''
+    };
+}
+
 function generateFlight(
     id: string,
     from: string,
@@ -31,8 +40,8 @@ function generateFlight(
     departureHour: number
 ): Flight {
     const airline = AIRLINES[airlineCode];
-    const origin = AIRPORTS[from];
-    const dest = AIRPORTS[to];
+    const origin = getAirport(from);
+    const dest = getAirport(to);
 
     // Create a base date (tomorrow)
     const today = new Date();
@@ -53,8 +62,8 @@ function generateFlight(
 
     const segments: FlightSegment[] = route.slice(0, -1).map((code, index) => {
         const segAirline = AIRLINES[airlineCode];
-        const depAirport = AIRPORTS[route[index]];
-        const arrAirport = AIRPORTS[route[index + 1]];
+        const depAirport = getAirport(route[index]);
+        const arrAirport = getAirport(route[index + 1]);
         const segDeparture = addMinutes(baseDate, index * (segmentDuration + 45));
         const segArrival = addMinutes(segDeparture, segmentDuration);
 
@@ -109,3 +118,23 @@ export const MOCK_FLIGHTS: Flight[] = [
 ];
 
 export const AIRPORT_OPTIONS = Object.values(AIRPORTS);
+
+export function generateMockFlightsForRoute(origin: string, destination: string): Flight[] {
+    const airlineCodes = Object.keys(AIRLINES);
+    const basePrice = 220 + Math.floor(Math.random() * 150);
+    const departures = [6, 9, 12, 15, 18, 21];
+
+    return departures.map((hour, idx) => {
+        const airlineCode = airlineCodes[idx % airlineCodes.length];
+        const stops = idx % 3;
+        return generateFlight(
+            `${origin}-${destination}-${idx + 1}`,
+            origin,
+            destination,
+            airlineCode,
+            basePrice + idx * 25,
+            stops,
+            hour
+        );
+    });
+}

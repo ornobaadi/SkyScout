@@ -3,6 +3,7 @@ import { amadeus } from '@/lib/amadeus-client';
 import { Flight, Airline, Airport, FareDetail, FlightSegment } from '@/lib/api/types';
 import { format } from 'date-fns';
 import { convertToUSD } from '@/lib/currency-converter';
+import { generateMockFlightsForRoute } from '@/lib/api/mock-data';
 
 // Helper to look up airline names (Mock/Hardcoded mostly as API returns codes, 
 // though Dictionaries in response contain them, we'll try to use that)
@@ -13,6 +14,8 @@ export async function GET(request: Request) {
     const origin = searchParams.get('origin');
     const destination = searchParams.get('destination');
     const date = searchParams.get('date');
+    const adults = searchParams.get('adults') || '1';
+    const travelClass = searchParams.get('travelClass') || undefined;
 
     if (!origin || !destination || !date) {
         return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
@@ -29,12 +32,18 @@ export async function GET(request: Request) {
             originLocationCode: origin,
             destinationLocationCode: destination,
             departureDate: departureDate,
-            adults: '1',
+            adults,
+            ...(travelClass ? { travelClass } : {}),
             max: '20'
         });
 
         const data = response.data; // The flight offers
         const dictionaries = response.result?.dictionaries; // Lookup tables for codes
+
+        if (!data || data.length === 0) {
+            const mockFlights = generateMockFlightsForRoute(origin, destination);
+            return NextResponse.json({ flights: mockFlights });
+        }
 
         // 2. Map Response to our Schema and convert prices to USD
         const flights: Flight[] = await Promise.all(data.map(async (offer: any) => {
@@ -86,7 +95,7 @@ export async function GET(request: Request) {
                 total: priceInUSD,
                 base: originalBase ? await convertToUSD(originalBase, originalCurrency) : undefined,
                 fees: originalFees
-                    ? await Promise.all(originalFees.map(async (fee) => ({
+                    ? await Promise.all(originalFees.map(async (fee: { amount: number; type?: string }) => ({
                         amount: await convertToUSD(fee.amount, originalCurrency),
                         type: fee.type
                     })))
@@ -218,6 +227,14 @@ export async function GET(request: Request) {
         // Only log detailed errors in development
         if (process.env.NODE_ENV === 'development') {
             console.error('Flight API Error:', error.message);
+        }
+
+        const mockFlights = origin && destination
+            ? generateMockFlightsForRoute(origin, destination)
+            : [];
+
+        if (mockFlights.length > 0) {
+            return NextResponse.json({ flights: mockFlights });
         }
         
         // Return generic error message in production

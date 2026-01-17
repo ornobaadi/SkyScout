@@ -319,7 +319,7 @@ async function fetchAirportCoordinates(airportCode: string): Promise<AirportCoor
 
             try {
                 return JSON.parse(cleanedResponse)
-            } catch (parseError) {
+            } catch {
                 const normalizedResponse = cleanedResponse
                     // Remove leading zeros from numeric values (e.g., 002.384 -> 2.384)
                     .replace(/:\s*([+-]?)0+(\d+(?:\.\d+)?)/g, ': $1$2')
@@ -327,12 +327,12 @@ async function fetchAirportCoordinates(airportCode: string): Promise<AirportCoor
 
                 try {
                     return JSON.parse(normalizedResponse)
-                } catch (secondParseError) {
+                } catch {
                     console.error('Failed to parse AI response:', data.response)
                     return null
                 }
             }
-        } catch (parseError) {
+        } catch {
             console.error('Failed to parse AI response:', data.response)
             return null
         }
@@ -409,9 +409,7 @@ export function FlightRouteMap({ origin, destination, className }: FlightRouteMa
             
             // Set a timer to show error after 15 seconds if still loading
             const errorTimeout = setTimeout(() => {
-                if (isLoading) {
-                    setShowError(true)
-                }
+                setShowError(true)
             }, 15000)
 
             try {
@@ -449,7 +447,7 @@ export function FlightRouteMap({ origin, destination, className }: FlightRouteMa
             <div className={cn("relative bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden", className)}>
                 <div className="absolute inset-0 animate-pulse">
                     {/* Skeleton map background */}
-                    <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800" />
+                    <div className="w-full h-full bg-linear-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800" />
                     
                     {/* Skeleton markers */}
                     <div className="absolute top-1/3 left-1/4 w-8 h-8 bg-slate-300 dark:bg-slate-600 rounded-full" />

@@ -4,16 +4,17 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { format } from "date-fns";
 import { TrendingDown, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getPriceForSearch } from "@/lib/api/pricing";
 
 export function PriceChart() {
-    const { filteredFlights, isLoading } = useSearchStore();
+    const { filteredFlights, isLoading, searchParams } = useSearchStore();
 
     // Prepare data - group by time slots for better visualization
     const data = [...filteredFlights]
         .sort((a, b) => new Date(a.departure.at).getTime() - new Date(b.departure.at).getTime())
         .map(flight => ({
             time: format(new Date(flight.departure.at), 'HH:mm'),
-            price: flight.price,
+            price: getPriceForSearch(flight, searchParams.passengers, searchParams.cabinClass),
             airline: flight.airline.name,
             stops: flight.stops,
             fullDate: flight.departure.at

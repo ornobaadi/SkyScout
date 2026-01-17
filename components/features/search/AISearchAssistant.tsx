@@ -177,7 +177,7 @@ export function AISearchAssistant({ onSearchIntent, className }: AISearchAssista
 
             {/* Chat Interface */}
             {isOpen && (
-                <div className="fixed bottom-6 right-6 w-[420px] h-[600px] bg-white dark:bg-slate-950 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col z-50">
+                <div className="fixed bottom-6 right-6 w-105 h-150 bg-white dark:bg-slate-950 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col z-50">
                     {/* Header */}
                     <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-t-2xl">
                         <div className="flex items-center gap-2">

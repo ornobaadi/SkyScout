@@ -5,10 +5,19 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { useMemo } from "react";
+import { Minus, Plus } from "lucide-react";
+import { getPriceForSearch } from "@/lib/api/pricing";
 
 export function FilterSidebar() {
-    const { filters, setFilter, resetFilters, allFlights, isLoading } = useSearchStore();
+    const { filters, setFilter, resetFilters, allFlights, isLoading, searchParams, setSearchParams } = useSearchStore();
 
     // Dynamically extract unique airlines from actual flight data
     const AIRLINES = useMemo(() => {
@@ -31,12 +40,14 @@ export function FilterSidebar() {
     // Calculate price range from actual data
     const priceRange = useMemo(() => {
         if (allFlights.length === 0) return { min: 0, max: 3000 };
-        const prices = allFlights.map(f => f.price);
+        const prices = allFlights.map((flight) =>
+            getPriceForSearch(flight, searchParams.passengers, searchParams.cabinClass)
+        );
         return {
             min: Math.floor(Math.min(...prices)),
             max: Math.ceil(Math.max(...prices))
         };
-    }, [allFlights]);
+    }, [allFlights, searchParams.passengers, searchParams.cabinClass]);
 
     const maxPriceValue = Math.min(filters.maxPrice, priceRange.max);
 
@@ -93,6 +104,51 @@ export function FilterSidebar() {
             {/* Results Count */}
             <div className="text-sm text-slate-600 dark:text-slate-400 pb-3 border-b border-slate-100 dark:border-slate-700/50">
                 <span className="font-medium text-slate-900 dark:text-white">{allFlights.length}</span> flights available
+            </div>
+
+            {/* Travelers & Cabin */}
+            <div className="space-y-4">
+                <div className="space-y-2">
+                    <Label className="font-medium text-slate-700 dark:text-slate-300 text-sm">Passengers</Label>
+                    <div className="flex items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-lg px-3 py-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSearchParams({ passengers: Math.max(1, searchParams.passengers - 1) })}
+                            disabled={searchParams.passengers <= 1}
+                        >
+                            <Minus className="w-4 h-4" />
+                        </Button>
+                        <div className="text-sm font-semibold text-slate-900 dark:text-white">
+                            {searchParams.passengers}
+                        </div>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSearchParams({ passengers: Math.min(9, searchParams.passengers + 1) })}
+                            disabled={searchParams.passengers >= 9}
+                        >
+                            <Plus className="w-4 h-4" />
+                        </Button>
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <Label className="font-medium text-slate-700 dark:text-slate-300 text-sm">Cabin class</Label>
+                    <Select
+                        value={searchParams.cabinClass}
+                        onValueChange={(val) => setSearchParams({ cabinClass: val as typeof searchParams.cabinClass })}
+                    >
+                        <SelectTrigger className="w-full">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Economy">Economy</SelectItem>
+                            <SelectItem value="Premium Economy">Premium Economy</SelectItem>
+                            <SelectItem value="Business">Business</SelectItem>
+                            <SelectItem value="First">First</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
 
             {/* Price */}
@@ -163,7 +219,7 @@ export function FilterSidebar() {
                                     <Checkbox
                                         id={`al-${airline.id}`}
                                         checked={filters.airlines.length === 0 || filters.airlines.includes(airline.id)}
-                                        onCheckedChange={(checked) => {
+                                        onCheckedChange={() => {
                                             const current = filters.airlines;
                                             let next;
                                             if (current.includes(airline.id)) {

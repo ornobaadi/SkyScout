@@ -9,9 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import Image from "next/image";
+import { useSearchStore } from "@/store/use-search-store";
+import { getPriceForSearch } from "@/lib/api/pricing";
 
 export function FlightCard({ flight }: { flight: Flight }) {
     const [expanded, setExpanded] = useState(false);
+    const { searchParams } = useSearchStore();
 
     // Duration formatter
     const hours = Math.floor(flight.duration / 60);
@@ -22,6 +25,13 @@ export function FlightCard({ flight }: { flight: Flight }) {
     const depDate = new Date(flight.departure.at);
     const arrDate = new Date(flight.arrival.at);
     const isNextDay = depDate.getDate() !== arrDate.getDate();
+
+    const effectivePrice = getPriceForSearch(
+        flight,
+        searchParams.passengers,
+        searchParams.cabinClass
+    );
+    const perPassengerPrice = effectivePrice / Math.max(searchParams.passengers, 1);
 
     const hasDetails = Boolean(
         (flight.segments && flight.segments.length > 0) ||
@@ -44,7 +54,7 @@ export function FlightCard({ flight }: { flight: Flight }) {
                 {/* Top Row: Airline Info */}
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
-                        <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 border border-slate-200 dark:border-slate-600 flex items-center justify-center overflow-hidden">
+                        <div className="relative w-10 h-10 rounded-xl bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 border border-slate-200 dark:border-slate-600 flex items-center justify-center overflow-hidden">
                             <Image
                                 src={flight.airline.logo}
                                 alt={flight.airline.name}
@@ -93,7 +103,7 @@ export function FlightCard({ flight }: { flight: Flight }) {
                             <span className="font-medium">{durationString}</span>
                         </div>
                         <div className="w-full relative flex items-center">
-                            <div className="flex-1 h-0.5 bg-gradient-to-r from-indigo-400 via-indigo-300 to-indigo-400 dark:from-indigo-600 dark:via-indigo-500 dark:to-indigo-600" />
+                            <div className="flex-1 h-0.5 bg-linear-to-r from-indigo-400 via-indigo-300 to-indigo-400 dark:from-indigo-600 dark:via-indigo-500 dark:to-indigo-600" />
                             <Circle className="w-2 h-2 text-indigo-500 dark:text-indigo-400 fill-current absolute left-0" />
                             {flight.stops > 0 && (
                                 <div className="absolute left-1/2 -translate-x-1/2 -top-1">
@@ -129,9 +139,15 @@ export function FlightCard({ flight }: { flight: Flight }) {
                         <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">Total price</div>
                         <div className="flex items-baseline gap-1">
                             <span className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 font-display">
-                                ${flight.price.toFixed(0)}
+                                ${effectivePrice.toFixed(0)}
                             </span>
                             <span className="text-sm text-slate-500 dark:text-slate-400">USD</span>
+                        </div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            {searchParams.passengers} passenger{searchParams.passengers > 1 ? 's' : ''} · {searchParams.cabinClass}
+                            {searchParams.passengers > 1 && (
+                                <span className="ml-1">(${perPassengerPrice.toFixed(0)} / passenger)</span>
+                            )}
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -154,7 +170,7 @@ export function FlightCard({ flight }: { flight: Flight }) {
 
             {/* Expanded Segment Details */}
             {expanded && (
-                <div className="border-t border-slate-200/50 dark:border-slate-700/50 bg-gradient-to-br from-slate-50/50 to-slate-100/50 dark:from-slate-800/30 dark:to-slate-900/30 p-6 backdrop-blur-sm">
+                <div className="border-t border-slate-200/50 dark:border-slate-700/50 bg-linear-to-br from-slate-50/50 to-slate-100/50 dark:from-slate-800/30 dark:to-slate-900/30 p-6 backdrop-blur-sm">
                     <div className="flex items-center gap-2 mb-6 text-slate-700 dark:text-slate-300">
                         <Info className="w-4 h-4" />
                         <h4 className="text-sm font-semibold font-display">Flight Details</h4>
@@ -204,7 +220,7 @@ export function FlightCard({ flight }: { flight: Flight }) {
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                                     <div>
                                         <div className="text-slate-500 dark:text-slate-400">Total (USD)</div>
-                                        <div className="font-semibold text-slate-900 dark:text-white">${flight.price.toFixed(2)}</div>
+                                        <div className="font-semibold text-slate-900 dark:text-white">${effectivePrice.toFixed(2)}</div>
                                     </div>
                                     <div>
                                         <div className="text-slate-500 dark:text-slate-400">Base (USD)</div>
