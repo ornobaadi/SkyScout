@@ -38,9 +38,10 @@ import type { CabinClass } from "@/lib/api/types"
 interface InlineSearchFormProps {
     defaultExpanded?: boolean
     onSearchStart?: () => void
+    embedded?: boolean  // When true, skips collapsed state and header - used when embedded in navbar dropdown
 }
 
-export function InlineSearchForm({ defaultExpanded = false, onSearchStart }: InlineSearchFormProps) {
+export function InlineSearchForm({ defaultExpanded = false, onSearchStart, embedded = false }: InlineSearchFormProps) {
     const router = useRouter()
     const currentSearchParams = useSearchParams()
     const { searchParams, setSearchParams, searchFlights, isLoading } = useSearchStore()
@@ -210,8 +211,8 @@ export function InlineSearchForm({ defaultExpanded = false, onSearchStart }: Inl
 
     const isValid = origin && destination && date && (tripType === "one-way" || returnDate)
 
-    // Render collapsed state
-    if (!isExpanded) {
+    // Render collapsed state - skip if embedded mode
+    if (!isExpanded && !embedded) {
         return (
             <button
                 onClick={() => setIsExpanded(true)}
@@ -265,22 +266,68 @@ export function InlineSearchForm({ defaultExpanded = false, onSearchStart }: Inl
         )
     }
 
-    // Render expanded state
+    // Render expanded/embedded state
     return (
-        <div className="bg-white dark:bg-slate-800/90 backdrop-blur-xl rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-lg overflow-hidden animate-in slide-in-from-top-2 duration-200">
-            {/* Header with trip type and collapse button */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700/50">
-                <div className="flex items-center gap-2">
-                    <Search className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                    <h3 className="font-semibold text-sm text-slate-900 dark:text-white">Modify Your Search</h3>
+        <div className={cn(
+            embedded 
+                ? "" // No wrapper styling when embedded
+                : "bg-white dark:bg-slate-800/90 backdrop-blur-xl rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-lg overflow-hidden animate-in slide-in-from-top-2 duration-200"
+        )}>
+            {/* Header with trip type and collapse button - hidden when embedded */}
+            {!embedded && (
+                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700/50">
+                    <div className="flex items-center gap-2">
+                        <Search className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                        <h3 className="font-semibold text-sm text-slate-900 dark:text-white">Modify Your Search</h3>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        {/* Trip Type Toggle - moved to right side */}
+                        <div className="flex items-center gap-1 p-0.5 bg-slate-100 dark:bg-slate-700/50 rounded-md">
+                            <button
+                                onClick={() => setTripType("round-trip")}
+                                className={cn(
+                                    "px-3 py-1.5 rounded text-xs font-medium transition-colors",
+                                    tripType === "round-trip"
+                                        ? "bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm"
+                                        : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                                )}
+                            >
+                                Round Trip
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setTripType("one-way")
+                                    setReturnDate(undefined)
+                                    setDateRange(date ? { from: date, to: undefined } : undefined)
+                                }}
+                                className={cn(
+                                    "px-3 py-1.5 rounded text-xs font-medium transition-colors",
+                                    tripType === "one-way"
+                                        ? "bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm"
+                                        : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                                )}
+                            >
+                                One Way
+                            </button>
+                        </div>
+                        <button
+                            onClick={() => setIsExpanded(false)}
+                            className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                        >
+                            <X className="w-4 h-4 text-slate-500" />
+                        </button>
+                    </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    {/* Trip Type Toggle - moved to right side */}
-                    <div className="flex items-center gap-1 p-0.5 bg-slate-100 dark:bg-slate-700/50 rounded-md">
+            )}
+
+            {/* Trip Type Toggle - shown inline when embedded */}
+            {embedded && (
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-1 p-0.5 bg-slate-100 dark:bg-slate-700/50 rounded-lg">
                         <button
                             onClick={() => setTripType("round-trip")}
                             className={cn(
-                                "px-3 py-1.5 rounded text-xs font-medium transition-colors",
+                                "px-4 py-2 rounded-md text-sm font-medium transition-colors",
                                 tripType === "round-trip"
                                     ? "bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm"
                                     : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
@@ -295,7 +342,7 @@ export function InlineSearchForm({ defaultExpanded = false, onSearchStart }: Inl
                                 setDateRange(date ? { from: date, to: undefined } : undefined)
                             }}
                             className={cn(
-                                "px-3 py-1.5 rounded text-xs font-medium transition-colors",
+                                "px-4 py-2 rounded-md text-sm font-medium transition-colors",
                                 tripType === "one-way"
                                     ? "bg-indigo-600 dark:bg-indigo-500 text-white shadow-sm"
                                     : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
@@ -304,16 +351,10 @@ export function InlineSearchForm({ defaultExpanded = false, onSearchStart }: Inl
                             One Way
                         </button>
                     </div>
-                    <button
-                        onClick={() => setIsExpanded(false)}
-                        className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                    >
-                        <X className="w-4 h-4 text-slate-500" />
-                    </button>
                 </div>
-            </div>
+            )}
 
-            <div className="p-4 space-y-4">
+            <div className={cn(embedded ? "" : "p-4", "space-y-4")}>
 
                 {/* Route Section - More compact */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 relative">

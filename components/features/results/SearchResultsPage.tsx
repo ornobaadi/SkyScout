@@ -37,6 +37,7 @@ export function SearchResultsPage({
     const searchParams = useSearchStore((state) => state.searchParams)
     const isLoading = useSearchStore((state) => state.isLoading)
     const [mounted, setMounted] = useState(false)
+    const [isSearchExpanded, setIsSearchExpanded] = useState(false)
 
     useEffect(() => {
         setMounted(true)
@@ -64,9 +65,28 @@ export function SearchResultsPage({
     const displayOrigin = searchParams.origin || initialOrigin
     const displayDestination = searchParams.destination || initialDestination
 
+    const handleSearchComplete = () => {
+        setIsSearchExpanded(false)
+    }
+
     return (
         <div className="min-h-screen bg-linear-to-br from-indigo-50/30 via-white to-blue-50/30 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-950">
-            <SearchHeader />
+            <SearchHeader 
+                showSearch={true} 
+                onModifyClick={() => setIsSearchExpanded(!isSearchExpanded)}
+                isSearchExpanded={isSearchExpanded}
+            />
+
+            {/* Expandable Search Form - Slides down from header */}
+            {isSearchExpanded && (
+                <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-700/50 shadow-lg animate-in slide-in-from-top duration-200">
+                    <div className="container mx-auto max-w-7xl px-3 sm:px-4 py-4">
+                        <Suspense fallback={<InlineSearchFormSkeleton />}>
+                            <InlineSearchForm defaultExpanded={true} onSearchStart={handleSearchComplete} embedded={true} />
+                        </Suspense>
+                    </div>
+                </div>
+            )}
 
             {/* Decorative background elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
@@ -75,11 +95,6 @@ export function SearchResultsPage({
             </div>
 
             <main className="container mx-auto max-w-7xl px-3 sm:px-4 py-4 sm:py-6 relative z-10 space-y-4 sm:space-y-6">
-                {/* Inline Search Form - Modify search without going back to homepage */}
-                <Suspense fallback={<InlineSearchFormSkeleton />}>
-                    <InlineSearchForm />
-                </Suspense>
-
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
 
                     {/* Mobile Filter Button - shown on mobile, hidden on desktop */}
