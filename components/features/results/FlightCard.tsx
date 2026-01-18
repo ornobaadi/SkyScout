@@ -50,6 +50,22 @@ export function FlightCard({ flight }: { flight: Flight }) {
         return `${h}h ${m}m`;
     };
 
+    // Build booking URL with flight data encoded
+    const handleSelectFlight = () => {
+        const flightData = encodeURIComponent(JSON.stringify(flight));
+        const params = new URLSearchParams();
+        params.set("data", flightData);
+        params.set("origin", searchParams.origin);
+        params.set("destination", searchParams.destination);
+        params.set("passengers", String(searchParams.passengers));
+        params.set("cabinClass", searchParams.cabinClass);
+        if (searchParams.departureDate) {
+            params.set("date", searchParams.departureDate.toISOString());
+        }
+        
+        router.push(`/booking/${flight.id}?${params.toString()}`);
+    };
+
     return (
         <div className="group bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-slate-200/50 dark:border-slate-700/50 hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-xl transition-all duration-300 overflow-hidden">
             <div className="p-4 sm:p-6">
@@ -166,7 +182,7 @@ export function FlightCard({ flight }: { flight: Flight }) {
                         </Button>
                         <Button 
                             className="px-6 sm:px-8 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white shadow-sm hover:shadow-md transition-all group-hover:scale-105 transform duration-200 flex-1 sm:flex-none text-sm sm:text-base"
-                            onClick={() => router.push(`/booking/${flight.id}`)}
+                            onClick={handleSelectFlight}
                         >
                             Select
                         </Button>

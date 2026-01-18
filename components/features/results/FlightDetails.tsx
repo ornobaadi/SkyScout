@@ -89,119 +89,113 @@ export function FlightDetails({ flight, searchParams }: FlightDetailsProps) {
                 </div>
 
                 {/* Flight Timeline */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    {/* Departure */}
-                    <div>
-                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">
-                            Departing flight · {format(depDate, 'EEE, MMM d')}
-                        </div>
-                        <div className="flex items-start gap-3">
-                            <div className="flex-1">
-                                <div className="text-4xl font-bold text-slate-900 dark:text-white mb-1">
-                                    {format(depDate, 'HH:mm')}
-                                </div>
-                                <div className="text-lg font-semibold text-slate-700 dark:text-slate-300">
-                                    {flight.departure.airport.code}
-                                </div>
-                                <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                                    {flight.departure.airport.name}
-                                </div>
-                                <div className="text-sm text-slate-500 dark:text-slate-400">
-                                    {flight.departure.airport.city}, {flight.departure.airport.country}
-                                </div>
+                <div className="mb-6">
+                    <div className="grid grid-cols-[1fr_auto_1fr] gap-6 items-center mb-6">
+                        {/* Departure */}
+                        <div>
+                            <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">
+                                Departing flight · {format(depDate, 'EEE, MMM d')}
+                            </div>
+                            <div className="text-5xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
+                                {format(depDate, 'HH:mm')}
+                            </div>
+                            <div className="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                                {flight.departure.airport.code}
+                            </div>
+                            <div className="text-sm text-slate-500 dark:text-slate-400">
+                                {flight.departure.airport.name}
+                            </div>
+                            <div className="text-sm text-slate-500 dark:text-slate-400">
+                                {flight.departure.airport.city}, {flight.departure.airport.country}
                             </div>
                         </div>
-                    </div>
 
-                    {/* Journey Info */}
-                    <div className="flex flex-col items-center justify-center">
-                        <div className="flex items-center gap-2 text-base text-slate-600 dark:text-slate-400 mb-3">
-                            <Clock className="w-5 h-5" />
-                            <span className="font-semibold">{durationString}</span>
+                        {/* Journey Info */}
+                        <div className="flex flex-col items-center justify-center px-8">
+                            <div className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400 mb-3">
+                                <Clock className="w-4 h-4" />
+                                <span>{durationString}</span>
+                            </div>
+                            <div className="w-32 relative flex items-center mb-3">
+                                <div className="flex-1 h-0.5 bg-gradient-to-r from-indigo-400 via-indigo-300 to-indigo-400 dark:from-indigo-600 dark:via-indigo-500 dark:to-indigo-600" />
+                                <Circle className="w-2.5 h-2.5 text-indigo-500 dark:text-indigo-400 fill-current absolute left-0" />
+                                {flight.stops > 0 && (
+                                    <div className="absolute left-1/2 -translate-x-1/2 -top-1.5">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-amber-400 dark:bg-amber-500 ring-2 ring-white dark:ring-slate-900" />
+                                    </div>
+                                )}
+                                <Plane className="w-5 h-5 text-indigo-600 dark:text-indigo-400 rotate-90 absolute left-1/2 -translate-x-1/2" />
+                                <Circle className="w-2.5 h-2.5 text-indigo-500 dark:text-indigo-400 fill-current absolute right-0" />
+                            </div>
+                            <div className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                                {flight.stops === 0 ? 'Nonstop' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`}
+                            </div>
                         </div>
-                        <div className="w-full relative flex items-center mb-3">
-                            <div className="flex-1 h-0.5 bg-linear-to-r from-indigo-400 via-indigo-300 to-indigo-400 dark:from-indigo-600 dark:via-indigo-500 dark:to-indigo-600" />
-                            <Circle className="w-2 h-2 text-indigo-500 dark:text-indigo-400 fill-current absolute left-0" />
-                            {flight.stops > 0 && (
-                                <div className="absolute left-1/2 -translate-x-1/2 -top-1">
-                                    <div className="w-2 h-2 rounded-full bg-amber-400 dark:bg-amber-500 ring-2 ring-white dark:ring-slate-900" />
-                                </div>
-                            )}
-                            <Plane className="w-4 h-4 text-indigo-600 dark:text-indigo-400 rotate-90 absolute left-1/2 -translate-x-1/2" />
-                            <Circle className="w-2 h-2 text-indigo-500 dark:text-indigo-400 fill-current absolute right-0" />
-                        </div>
-                        <div className="text-base font-medium text-slate-600 dark:text-slate-400">
-                            {flight.stops === 0 ? 'Nonstop' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`}
-                        </div>
-                    </div>
 
-                    {/* Arrival */}
-                    <div className="text-right md:text-left">
-                        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">
-                            Arrival · {format(arrDate, 'EEE, MMM d')}
-                        </div>
-                        <div className="flex items-start gap-3 justify-end md:justify-start">
-                            <div className="flex-1 md:text-left text-right">
-                                <div className="text-4xl font-bold text-slate-900 dark:text-white mb-1">
-                                    {format(arrDate, 'HH:mm')}
-                                    {isNextDay && (
-                                        <span className="text-orange-500 dark:text-orange-400 text-xl ml-2">+1</span>
-                                    )}
-                                </div>
-                                <div className="text-lg font-semibold text-slate-700 dark:text-slate-300">
-                                    {flight.arrival.airport.code}
-                                </div>
-                                <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                                    {flight.arrival.airport.name}
-                                </div>
-                                <div className="text-sm text-slate-500 dark:text-slate-400">
-                                    {flight.arrival.airport.city}, {flight.arrival.airport.country}
-                                </div>
+                        {/* Arrival */}
+                        <div className="text-right">
+                            <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">
+                                Arrival · {format(arrDate, 'EEE, MMM d')}
+                            </div>
+                            <div className="text-5xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
+                                {format(arrDate, 'HH:mm')}
+                                {isNextDay && (
+                                    <span className="text-orange-500 dark:text-orange-400 text-2xl ml-2">+1</span>
+                                )}
+                            </div>
+                            <div className="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                                {flight.arrival.airport.code}
+                            </div>
+                            <div className="text-sm text-slate-500 dark:text-slate-400">
+                                {flight.arrival.airport.name}
+                            </div>
+                            <div className="text-sm text-slate-500 dark:text-slate-400">
+                                {flight.arrival.airport.city}, {flight.arrival.airport.country}
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Additional Info */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-slate-200 dark:border-slate-700">
                     <div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400 mb-1">Total price</div>
-                        <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                        <div className="text-sm text-slate-500 dark:text-slate-400 mb-1.5">Total price</div>
+                        <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
                             ${effectivePrice.toFixed(0)}
                         </div>
                         {searchParams.passengers > 1 && (
-                            <div className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                            <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                                 ${perPassengerPrice.toFixed(0)} per person
                             </div>
                         )}
                     </div>
                     <div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400 mb-1">Cabin class</div>
-                        <div className="text-base font-semibold text-slate-900 dark:text-white">
+                        <div className="text-sm text-slate-500 dark:text-slate-400 mb-1.5">Cabin class</div>
+                        <div className="text-lg font-semibold text-slate-900 dark:text-white">
                             {searchParams.cabinClass}
                         </div>
                     </div>
                     <div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400 mb-1">Passengers</div>
-                        <div className="text-base font-semibold text-slate-900 dark:text-white">
+                        <div className="text-sm text-slate-500 dark:text-slate-400 mb-1.5">Passengers</div>
+                        <div className="text-lg font-semibold text-slate-900 dark:text-white">
                             {searchParams.passengers} {searchParams.passengers === 1 ? 'Adult' : 'Adults'}
                         </div>
                     </div>
                     <div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1">
+                        <div className="text-sm text-slate-500 dark:text-slate-400 mb-1.5 flex items-center gap-1.5">
                             <Luggage className="w-4 h-4" />
                             Checked bags
                         </div>
-                        <div className="text-base font-semibold text-slate-900 dark:text-white">
+                        <div className="text-lg font-semibold text-slate-900 dark:text-white">
                             {baggageInfo?.quantity ? (
-                                <>
-                                    {baggageInfo.quantity} included
+                                <div>
+                                    {baggageInfo.quantity} free carry-on
                                     {baggageInfo.weight && (
-                                        <span className="text-sm text-slate-500 dark:text-slate-400 ml-1">
-                                            ({baggageInfo.weight}{baggageInfo.weightUnit})
-                                        </span>
+                                        <div className="text-sm font-normal text-slate-500 dark:text-slate-400 mt-0.5">
+                                            {baggageInfo.weight}{baggageInfo.weightUnit} each
+                                        </div>
                                     )}
-                                </>
+                                </div>
                             ) : (
                                 '1 free carry-on'
                             )}
@@ -211,15 +205,10 @@ export function FlightDetails({ flight, searchParams }: FlightDetailsProps) {
 
                 {/* Emissions */}
                 {flight.priceBreakdown && (
-                    <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-                        <div className="text-sm text-slate-500 dark:text-slate-400">
+                    <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+                        <div className="text-sm text-slate-600 dark:text-slate-400">
                             Average legroom (30 in) · In-seat USB outlet · On-demand video
                         </div>
-                        {flight.stops === 0 && (
-                            <div className="text-sm text-green-600 dark:text-green-400 mt-1">
-                                +17% emissions · 48 kg CO2e
-                            </div>
-                        )}
                     </div>
                 )}
 
@@ -230,7 +219,7 @@ export function FlightDetails({ flight, searchParams }: FlightDetailsProps) {
                             variant="ghost"
                             onClick={() => setShowDetails(!showDetails)}
                             className="w-full text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
-                        >
+                        >6 pt-6
                             {showDetails ? 'Hide' : 'View'} detailed flight information
                             <ChevronDown className={`w-4 h-4 ml-2 transition-transform duration-200 ${showDetails ? 'rotate-180' : ''}`} />
                         </Button>
