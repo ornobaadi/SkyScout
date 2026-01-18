@@ -555,8 +555,8 @@ export const InlineSearchForm = React.forwardRef<
                                                 if (range?.to) setReturnDate(range.to)
                                             }}
                                             disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
-                                            numberOfMonths={2}
-                                            className="p-4 [--cell-size:--spacing(12)]"
+                                            numberOfMonths={1}
+                                            className="p-2 sm:p-4 [--cell-size:--spacing(10)] sm:[--cell-size:--spacing(12)]"
                                             month={calendarMonth}
                                             onMonthChange={setCalendarMonth}
                                             prices={origin && destination ? priceCalendar : undefined}

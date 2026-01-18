@@ -63,19 +63,19 @@ export function PriceChart() {
     );
 
     return (
-        <div className="w-full h-full pt-2 pr-4 relative">
-            {/* Stats Badge */}
-            <div className="absolute top-2 left-4 z-10 flex gap-3">
-                <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur border border-slate-200 dark:border-slate-700 px-3 py-2 rounded-lg shadow-sm">
-                    <div className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">Lowest Price</div>
-                    <div className="text-xl font-bold text-green-600 dark:text-green-400 flex items-center gap-1">
-                        <TrendingDown className="w-4 h-4" />
+        <div className="w-full h-full pt-2 pr-2 sm:pr-4 relative">
+            {/* Stats Badge - Responsive stacking */}
+            <div className="absolute top-2 left-2 sm:left-4 z-10 flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur border border-slate-200 dark:border-slate-700 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg shadow-sm">
+                    <div className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mb-0.5">Lowest Price</div>
+                    <div className="text-base sm:text-xl font-bold text-green-600 dark:text-green-400 flex items-center gap-1">
+                        <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4" />
                         ${minPrice.toFixed(0)}
                     </div>
                 </div>
-                <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur border border-slate-200 dark:border-slate-700 px-3 py-2 rounded-lg shadow-sm">
-                    <div className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">Avg Price</div>
-                    <div className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+                <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur border border-slate-200 dark:border-slate-700 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg shadow-sm">
+                    <div className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mb-0.5">Avg Price</div>
+                    <div className="text-base sm:text-xl font-bold text-indigo-600 dark:text-indigo-400">
                         ${Math.round(data.reduce((sum, d) => sum + d.price, 0) / data.length)}
                     </div>
                 </div>

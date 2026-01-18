@@ -182,7 +182,7 @@ export function LocationInput({ value, onChange, onSelect, displayValue, onDispl
             <div
                 onClick={() => inputRef.current?.focus()}
                 className={cn(
-                    "flex items-center gap-3 w-full h-16 px-5 rounded-lg border transition-all cursor-text",
+                    "flex items-center gap-2 sm:gap-3 w-full h-14 sm:h-16 px-3 sm:px-5 rounded-lg border transition-all cursor-text",
                     "hover:bg-slate-50 dark:hover:bg-slate-900",
                     value && displayValue && !inputValue
                         ? "bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-700"
@@ -190,7 +190,7 @@ export function LocationInput({ value, onChange, onSelect, displayValue, onDispl
                     open && "ring-0 ring-violet-500 border-violet-500"
                 )}
             >
-                <MapPin className="w-5 h-5 text-slate-400 dark:text-slate-500 shrink-0" />
+                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 dark:text-slate-500 shrink-0" />
                 <div className="flex flex-col gap-0.5 flex-1 min-w-0">
                     <input
                         ref={inputRef}
@@ -203,11 +203,11 @@ export function LocationInput({ value, onChange, onSelect, displayValue, onDispl
                         }}
                         onFocus={() => setOpen(true)}
                         onKeyDown={handleKeyDown}
-                        className="w-full text-base font-medium text-slate-900 dark:text-white bg-transparent outline-none placeholder:text-slate-400 placeholder:font-normal"
+                        className="w-full text-sm sm:text-base font-medium text-slate-900 dark:text-white bg-transparent outline-none placeholder:text-slate-400 placeholder:font-normal"
                         autoComplete="off"
                     />
                     {value && !inputValue && (
-                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                        <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">
                             {value}
                         </span>
                     )}
@@ -217,7 +217,7 @@ export function LocationInput({ value, onChange, onSelect, displayValue, onDispl
             {/* Dropdown */}
             {open && (
                 <div className="absolute top-full left-0 right-0 mt-2 z-50 bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
-                    <div className="max-h-[320px] overflow-y-auto p-2">
+                    <div className="max-h-[60vh] sm:max-h-[320px] overflow-y-auto p-2">
                             {/* AI Insights - Clean & Minimal */}
                             {!loading && aiInsight && aiInsight.confidence > 0.7 && (
                                 <div className="mx-2 mb-2 px-3 py-2 border border-slate-200 dark:border-slate-800 rounded-md bg-slate-50/50 dark:bg-slate-900/50">

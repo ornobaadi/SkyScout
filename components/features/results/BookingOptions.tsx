@@ -292,16 +292,18 @@ export function BookingOptions({ flight, searchParams }: BookingOptionsProps) {
                                             href={provider.url} 
                                             target="_blank" 
                                             rel="noopener noreferrer"
+                                            className="w-full sm:w-auto"
                                         >
                                             <Button
-                                                className={`px-6 py-2 shadow-sm hover:shadow-md transition-all ${
+                                                className={`w-full sm:w-auto px-4 sm:px-6 py-2 shadow-sm hover:shadow-md transition-all ${
                                                     provider.isBestPrice
                                                         ? 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700'
                                                         : 'bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600'
                                                 } text-white`}
                                             >
-                                                <span className="flex items-center gap-2">
-                                                    View on {provider.name}
+                                                <span className="flex items-center justify-center gap-2">
+                                                    <span className="hidden sm:inline">View on {provider.name}</span>
+                                                    <span className="sm:hidden">View</span>
                                                     <ExternalLink className="w-4 h-4" />
                                                 </span>
                                             </Button>

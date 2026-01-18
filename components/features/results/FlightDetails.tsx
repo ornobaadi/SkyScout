@@ -89,34 +89,101 @@ export function FlightDetails({ flight, searchParams }: FlightDetailsProps) {
                 </div>
 
                 {/* Flight Timeline */}
-                <div className="mb-6">
-                    <div className="grid grid-cols-[1fr_auto_1fr] gap-6 items-center mb-6">
+                <div className="mb-4 sm:mb-6">
+                    {/* Mobile Layout (stacked) */}
+                    <div className="flex flex-col gap-4 sm:hidden">
+                        {/* Departure */}
+                        <div className="flex items-start gap-3">
+                            <div className="flex flex-col items-center">
+                                <Circle className="w-3 h-3 text-indigo-500 dark:text-indigo-400 fill-current" />
+                                <div className="w-0.5 h-16 bg-gradient-to-b from-indigo-400 to-indigo-300 dark:from-indigo-600 dark:to-indigo-500" />
+                            </div>
+                            <div className="flex-1">
+                                <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                                    Departing · {format(depDate, 'EEE, MMM d')}
+                                </div>
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-2xl font-bold text-slate-900 dark:text-white">
+                                        {format(depDate, 'HH:mm')}
+                                    </span>
+                                    <span className="text-lg font-semibold text-slate-700 dark:text-slate-300">
+                                        {flight.departure.airport.code}
+                                    </span>
+                                </div>
+                                <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                                    {flight.departure.airport.city}, {flight.departure.airport.country}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Duration indicator */}
+                        <div className="flex items-center gap-3 pl-1">
+                            <div className="flex items-center justify-center w-4">
+                                <Plane className="w-4 h-4 text-indigo-600 dark:text-indigo-400 rotate-90" />
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                <Clock className="w-3.5 h-3.5" />
+                                <span>{durationString}</span>
+                                <span className="text-slate-400">·</span>
+                                <span>{flight.stops === 0 ? 'Nonstop' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`}</span>
+                            </div>
+                        </div>
+
+                        {/* Arrival */}
+                        <div className="flex items-start gap-3">
+                            <div className="flex flex-col items-center">
+                                <Circle className="w-3 h-3 text-indigo-500 dark:text-indigo-400 fill-current" />
+                            </div>
+                            <div className="flex-1">
+                                <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                                    Arrival · {format(arrDate, 'EEE, MMM d')}
+                                </div>
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-2xl font-bold text-slate-900 dark:text-white">
+                                        {format(arrDate, 'HH:mm')}
+                                    </span>
+                                    {isNextDay && (
+                                        <span className="text-orange-500 dark:text-orange-400 text-sm font-semibold">+1</span>
+                                    )}
+                                    <span className="text-lg font-semibold text-slate-700 dark:text-slate-300">
+                                        {flight.arrival.airport.code}
+                                    </span>
+                                </div>
+                                <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                                    {flight.arrival.airport.city}, {flight.arrival.airport.country}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Desktop Layout (horizontal grid) */}
+                    <div className="hidden sm:grid grid-cols-[1fr_auto_1fr] gap-4 md:gap-6 items-center mb-6">
                         {/* Departure */}
                         <div>
-                            <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">
+                            <div className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mb-2 sm:mb-3">
                                 Departing flight · {format(depDate, 'EEE, MMM d')}
                             </div>
-                            <div className="text-5xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
+                            <div className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
                                 {format(depDate, 'HH:mm')}
                             </div>
-                            <div className="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                            <div className="text-base md:text-lg lg:text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 {flight.departure.airport.code}
                             </div>
-                            <div className="text-sm text-slate-500 dark:text-slate-400">
+                            <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                                 {flight.departure.airport.name}
                             </div>
-                            <div className="text-sm text-slate-500 dark:text-slate-400">
+                            <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                                 {flight.departure.airport.city}, {flight.departure.airport.country}
                             </div>
                         </div>
 
                         {/* Journey Info */}
-                        <div className="flex flex-col items-center justify-center px-8">
-                            <div className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400 mb-3">
-                                <Clock className="w-4 h-4" />
+                        <div className="flex flex-col items-center justify-center px-4 md:px-6 lg:px-8">
+                            <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400 mb-2 sm:mb-3">
+                                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                 <span>{durationString}</span>
                             </div>
-                            <div className="w-32 relative flex items-center mb-3">
+                            <div className="w-20 sm:w-24 md:w-32 relative flex items-center mb-2 sm:mb-3">
                                 <div className="flex-1 h-0.5 bg-gradient-to-r from-indigo-400 via-indigo-300 to-indigo-400 dark:from-indigo-600 dark:via-indigo-500 dark:to-indigo-600" />
                                 <Circle className="w-2.5 h-2.5 text-indigo-500 dark:text-indigo-400 fill-current absolute left-0" />
                                 {flight.stops > 0 && (
@@ -134,22 +201,22 @@ export function FlightDetails({ flight, searchParams }: FlightDetailsProps) {
 
                         {/* Arrival */}
                         <div className="text-right">
-                            <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">
+                            <div className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mb-2 sm:mb-3">
                                 Arrival · {format(arrDate, 'EEE, MMM d')}
                             </div>
-                            <div className="text-5xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
+                            <div className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
                                 {format(arrDate, 'HH:mm')}
                                 {isNextDay && (
-                                    <span className="text-orange-500 dark:text-orange-400 text-2xl ml-2">+1</span>
+                                    <span className="text-orange-500 dark:text-orange-400 text-lg md:text-xl lg:text-2xl ml-2">+1</span>
                                 )}
                             </div>
-                            <div className="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                            <div className="text-base md:text-lg lg:text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
                                 {flight.arrival.airport.code}
                             </div>
-                            <div className="text-sm text-slate-500 dark:text-slate-400">
+                            <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                                 {flight.arrival.airport.name}
                             </div>
-                            <div className="text-sm text-slate-500 dark:text-slate-400">
+                            <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                                 {flight.arrival.airport.city}, {flight.arrival.airport.country}
                             </div>
                         </div>
@@ -157,36 +224,36 @@ export function FlightDetails({ flight, searchParams }: FlightDetailsProps) {
                 </div>
 
                 {/* Additional Info */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pt-4 sm:pt-6 border-t border-slate-200 dark:border-slate-700">
                     <div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400 mb-1.5">Total price</div>
-                        <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+                        <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-1 sm:mb-1.5">Total price</div>
+                        <div className="text-2xl sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400">
                             ${effectivePrice.toFixed(0)}
                         </div>
                         {searchParams.passengers > 1 && (
-                            <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                            <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
                                 ${perPassengerPrice.toFixed(0)} per person
                             </div>
                         )}
                     </div>
                     <div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400 mb-1.5">Cabin class</div>
-                        <div className="text-lg font-semibold text-slate-900 dark:text-white">
+                        <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-1 sm:mb-1.5">Cabin class</div>
+                        <div className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white">
                             {searchParams.cabinClass}
                         </div>
                     </div>
                     <div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400 mb-1.5">Passengers</div>
-                        <div className="text-lg font-semibold text-slate-900 dark:text-white">
+                        <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-1 sm:mb-1.5">Passengers</div>
+                        <div className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white">
                             {searchParams.passengers} {searchParams.passengers === 1 ? 'Adult' : 'Adults'}
                         </div>
                     </div>
                     <div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400 mb-1.5 flex items-center gap-1.5">
-                            <Luggage className="w-4 h-4" />
+                        <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-1 sm:mb-1.5 flex items-center gap-1.5">
+                            <Luggage className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             Checked bags
                         </div>
-                        <div className="text-lg font-semibold text-slate-900 dark:text-white">
+                        <div className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white">
                             {baggageInfo?.quantity ? (
                                 <div>
                                     {baggageInfo.quantity} free carry-on
